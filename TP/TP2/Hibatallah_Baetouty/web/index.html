@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>MaintAI : client web</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; }
+  label { display: block; margin-top: 12px; }
+  input { width: 100%; padding: 6px; box-sizing: border-box; }
+  button { margin-top: 16px; padding: 8px 16px; }
+  #result { margin-top: 20px; padding: 12px; border-radius: 6px; white-space: pre-line; }
+  .ok { background: #e6f4ea; } .alert { background: #fde7e7; } .err { background: #fff4e5; }
+</style>
+</head>
+<body>
+<h1>MaintAI</h1>
+<label>URL de l'API <input id="url" value="http://localhost:8000"></label>
+<label>Clé API <input id="key" type="password"></label>
+<label>Température (°C) <input id="temperature_c" type="number" step="0.1" value="72"></label>
+<label>Vibration (mm/s) <input id="vibration_mm_s" type="number" step="0.1" value="6"></label>
+<label>Charge (%) <input id="load_pct" type="number" step="1" value="85"></label>
+<label>Heures de fonctionnement <input id="runtime_hours" type="number" step="100" value="15000"></label>
+<button id="go">Prédire</button>
+<div id="result"></div>
+<script>
+const FEATURES = ["temperature_c", "vibration_mm_s", "load_pct", "runtime_hours"];
+const LABELS = {
+  temperature_c: "Température",
+  vibration_mm_s: "Vibration",
+  load_pct: "Charge",
+  runtime_hours: "Heures de fonctionnement",
+};
+
+// Traduit une erreur de validation Pydantic (422) en phrase lisible
+const formatErreur = e => {
+  const champ = LABELS[e.loc[e.loc.length - 1]] ?? e.loc.join(".");
+  if (e.type === "less_than_equal") return `${champ} ${e.input} dépasse le maximum autorisé (${e.ctx.le})`;
+  if (e.type === "greater_than_equal") return `${champ} ${e.input} est sous le minimum autorisé (${e.ctx.ge})`;
+  return `${champ} : ${e.msg}`;
+};
+
+const show = (cls, text) => {
+  const r = document.getElementById("result");
+  r.className = cls;
+  r.textContent = text;
+};
+
+document.getElementById("go").addEventListener("click", async () => {
+  const reading = Object.fromEntries(FEATURES.map(f => [f, Number(document.getElementById(f).value)]));
+  const adresse = document.getElementById("url").value.replace(/\/+$/, "") + "/v1/predict";
+  const cle = document.getElementById("key").value;
+  try {
+    const resp = await fetch(adresse, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-API-Key": cle },
+      body: JSON.stringify(reading),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      // 401, 503 : detail est un texte ; 422 : une liste d'erreurs
+      const detail = Array.isArray(data.detail) ? data.detail.map(formatErreur).join("\n") : data.detail;
+      show("err", `Erreur ${resp.status} : ${detail}`);
+      return;
+    }
+    const proba = (data.failure_probability * 100).toFixed(1);
+    if (data.alert) {
+      show("alert", `ALERTE : probabilité de panne ${proba} %`);
+    } else {
+      show("ok", `Pas d'alerte : probabilité de panne ${proba} %`);
+    }
+  } catch (e) {
+    show("err", "API injoignable : uvicorn est arrêté, ou CORS bloque cette origine (voir F12)");
+  }
+});
+</script>
+</body>
+</html>
