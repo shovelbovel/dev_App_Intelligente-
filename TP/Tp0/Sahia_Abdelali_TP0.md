@@ -1,5 +1,6 @@
 # TP0 : MaintAI
-**Nom :** Prénom Nom · **Groupe :** G3
+**Nom :*sahia* Prénom abdelali · **Groupe :** g1
+
 
 ## Le problème
 Prédire une panne à partir de 4 capteurs. Si on rate une panne, la ligne s'arrête.
