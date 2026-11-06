@@ -32,7 +32,7 @@ Elle fait des fausses alertes (une sur deux), mais c'est moins grave que de rate
 ---
 
 # TP0 : Cantine
-**Nom :** Prénom Nom · **Groupe :** G3
+**Nom :** Abdelali sahia · **Groupe :** G1
 
 ## Le problème
 Prédire le nombre de repas servis chaque jour avec 2 capteurs : la température et la pluie.
