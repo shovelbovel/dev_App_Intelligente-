@@ -34,7 +34,7 @@ Le défaut, c'est qu'elle donne beaucoup de fausses alertes : une fois sur deux,
 ---
 
 # TP0 : Cantine
-**Nom :Baetouty   hibatallah · **Groupe :** G3
+**Nom :Baetouty   hibatallah · **Groupe :** G1
 
 ## Le problème
 Deviner combien de repas la cantine va servir dans la journée, en utilisant seulement 2 capteurs : la température et la pluie.
