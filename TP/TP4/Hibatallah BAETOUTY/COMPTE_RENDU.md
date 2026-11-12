@@ -1,6 +1,6 @@
 # Compte rendu · TP4 : MaintAI devient un package Python
 
-**Groupe : g1  ·  **Membres : Hibatallah Baetouty  ·  **Date :** 12/11/2026
+**Groupe : g1  ·  **Membres : Hibatallah Baetouty  ·  **Date :** 12/11/2026 12:15
 
 ---
 
