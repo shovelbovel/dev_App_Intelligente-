@@ -1,6 +1,6 @@
 # Compte rendu · TP3 : une interface Streamlit pour MaintAI
 
-**Groupe :** g1  ·  **Membres :** hibatallah baetouty  ·  **Date :** 12/11/2026
+**Groupe :** g1  ·  **Membres :** hibatallah baetouty  ·  **Date :** 12/11/2026 10:00
 
 ---
 
