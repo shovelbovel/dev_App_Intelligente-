@@ -1,6 +1,6 @@
 # Compte rendu · TP4 : MaintAI devient un package Python
 
-**Groupe :** …  ·  **Membres :** …  ·  **Date :** 12/11/2026
+**Groupe :** …  ·  **Membres :** …  ·  **Date :** 12/11/2026 12:15
 
 ---
 
