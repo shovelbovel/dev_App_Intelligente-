@@ -1,2 +1,5 @@
 ﻿mlflow.db
 mlruns/
+*.egg-info/
+models/
+.pytest_cache/
