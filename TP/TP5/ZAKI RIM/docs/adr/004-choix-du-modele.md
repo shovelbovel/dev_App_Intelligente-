@@ -1,7 +1,7 @@
 
 # ADR 004 : choix du modèle et du seuil d'alerte de MaintAI
 
-Date : 19/11/2026 · Auteurs : Haitam Salah-Eddine [et les autres membres du groupe]
+Date : 19/11/2026 · Auteurs : Rim ZAKI
 
 ## Contexte
 MaintAI doit signaler les machines proches de la panne. Une panne manquée (faux négatif) coûte bien plus cher
