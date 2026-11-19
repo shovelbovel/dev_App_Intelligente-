@@ -1,6 +1,6 @@
 # ADR 000 : Choix du modèle et du seuil d'alerte de MaintAI
 
-Date : 19/11/2026 · Auteurs : Rim ZAKI
+Date : 19/11/2026 · Auteurs : Rim ZAKI 15:16
 
 ## Contexte
 MaintAI doit prévenir les pannes de machines à partir de quatre capteurs (température, vibration, charge, heures de fonctionnement). Les pannes sont rares (13,6 % des relevés : la baseline « jamais de panne » a 86,4 % d'accuracy et 0 % de recall), et **une panne manquée coûte plus cher qu'une fausse alerte**. Il faut donc choisir le modèle et le seuil en regardant d'abord le **recall**, pas l'accuracy.
