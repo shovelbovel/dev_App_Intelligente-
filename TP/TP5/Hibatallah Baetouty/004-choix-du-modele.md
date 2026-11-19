@@ -1,6 +1,6 @@
 # ADR 004 : modèle et seuil d'alerte retenus pour MaintAI
 
-Date : [18/11/2026] temps : [11:45] · Auteurs : [hibatallah baetouty]
+Date : [18/11/2026] temps : [12:00] · Auteurs : [hibatallah baetouty]
 
 ## Contexte
 
