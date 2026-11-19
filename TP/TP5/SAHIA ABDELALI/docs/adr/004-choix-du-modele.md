@@ -1,6 +1,6 @@
 # ADR 004 : choix du modèle et du seuil d'alerte
 
-Date : 19/11/2026 · Auteurs : SAHIA ABDELALI (G1)
+Date : 19/11/2026 · Auteurs : SAHIA ABDELALI (G1) temps: 12:00
 
 ## Contexte
 MaintAI doit signaler les machines qui vont tomber en panne. Une panne manquée coûte plus cher qu'une fausse alerte : le critère principal est donc le **recall**, la précision vient ensuite.
