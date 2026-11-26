@@ -1,6 +1,6 @@
 # ADR 005 : ce qui entre dans l'image Docker de MaintAI
 
-Date : 26/11/2026 · Auteurs : […]
+Date : 26/11/2026 · Auteurs : Rim ZAKI 11:56
 
 ## Contexte
 MaintAI doit tourner à l'identique sur n'importe quelle machine équipée de Docker : l'API (port 8000) et l'interface Streamlit (port 8501). Le modèle a été écrit par scikit-learn 1.8.0 et doit être chargé avec cette même version. La clé API ne doit jamais être publiée. Il faut décider de ce qu'on met dans l'image et de ce qui arrive au lancement.
