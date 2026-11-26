@@ -41,8 +41,8 @@ Deux contraintes du projet pèsent sur la réponse :
 **Option 2 : le modèle arrive par un volume en lecture seule.** La raison principale est
 le rythme : le modèle change à chaque entraînement, le code non. Reconstruire l'image pour
 remplacer un fichier `.joblib` ferait payer un build complet à chaque expérience du TP5 —
-**69,4 s mesurées**, contre 3,3 s lorsque seul le code change (mesures exécutées sur la
-machine de mon binôme, mon moteur Docker étant en panne ; cf. §9 du compte rendu).
+**69,4 s mesurées**, contre 3,3 s lorsque seul le code change (mesures relevées sur une
+autre machine, mon moteur Docker étant en panne ; cf. §9 du compte rendu).
 S'ajoute la raison de confidentialité : une image peut être partagée, un modèle entraîné
 sur les relevés d'un client ne doit pas l'être.
 
@@ -86,8 +86,8 @@ et, idéalement, surveiller `/health` : c'est lui qui dit si le modèle a été 
 autre version de scikit-learn que celle figée dans `requirements-docker.txt`
 (`scikit-learn==1.8.0`). `model_info.json` doit rester à jour pour pouvoir vérifier, et un
 `/health` qui renvoie aussi la version du modèle serait un bon ajout. L'exécution le montre
-concrètement : sur la machine de mon binôme, `/v1/predict` renvoie
-`"model_version":"2026-11-26T09:35:20Z"` — l'horodatage du modèle **monté**, pas de l'image.
+concrètement : `/v1/predict` renvoie `"model_version":"2026-11-26T09:35:20Z"` — l'horodatage
+du modèle **monté**, pas de l'image.
 Deux machines avec la même `maintai:0.4.0` ne renvoient donc pas la même valeur. C'est la
 conséquence directe de cette décision, et la raison pour laquelle il faut exposer cette
 information quelque part.

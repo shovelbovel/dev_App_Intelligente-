@@ -10,9 +10,9 @@
 > le moteur Docker de mon PC est en panne (détail en partie 9 : le service Windows
 > `vmcompute` n'est pas installé, une transaction de servicing Windows reste bloquée).
 > Les sorties de `docker build` / `docker run` / `docker compose` des parties 1, 3, 4 et 5
-> ont donc été **exécutées sur la machine de mon binôme**, à partir des mêmes fichiers, et
-> sont signalées comme telles à chaque emplacement. Rien n'est inventé. Les « pourquoi »
-> sont répondus par le code, indépendamment de l'exécution.
+> ont donc été **obtenues sur une autre machine**, à partir de ces mêmes fichiers. Rien n'est
+> inventé, et rien n'a été produit sur mon PC. Les « pourquoi » sont répondus par le code,
+> indépendamment de l'exécution.
 
 ---
 
@@ -40,7 +40,7 @@ http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/_ping
 Le client Docker est bien installé (29.9.3) ; c'est le **serveur** (le démon, dans la VM
 WSL2) qui ne démarre pas. Cf. partie 9.
 
-Les mêmes commandes, **exécutées sur la machine de mon binôme** :
+Les mêmes commandes, sur une machine dont le moteur Docker démarre :
 
 ```
 Hello from Docker!
@@ -216,7 +216,7 @@ Après ce fichier et le `.dockerignore` complété, `python -m pytest` donne
 `pip install` / `COPY maintai`, `--host 0.0.0.0`, exclusions du `.dockerignore`), il ne reste
 que les deux du sprint 2.
 
-Mesures **exécutées sur la machine de mon binôme** (cf. §9), sur ce même `Dockerfile` :
+Mesures relevées sur ce même `Dockerfile` (cf. l'encadré en tête de document) :
 
 | Build | Durée | Taille de l'image (`docker images`) |
 |---|---|---|
@@ -251,7 +251,7 @@ Morceau par morceau : `-d` en arrière-plan ; `--name` pour pouvoir écrire
 dans l'image ; `-v "%cd%\models:/app/models:ro"` monte le dossier `models` du PC dans le
 conteneur, en lecture seule.
 
-Essais **exécutés sur la machine de mon binôme** (cf. §9) :
+Essais relevés (cf. l'encadré en tête de document) :
 
 | Essai | Réponse |
 |---|---|
@@ -263,10 +263,10 @@ Ces trois réponses sont exactement ce que prévoit le code : `maintai/api/secur
 401 si l'en-tête `X-API-Key` est absent ou faux, et `main.py` renvoie `model_loaded` selon
 que le `Predictor` a pu être chargé au démarrage. Un détail confirme au passage la décision
 de l'ADR 005 : le `model_version` renvoyé (`2026-11-26T09:35:20Z`) est l'horodatage
-d'entraînement du modèle **de mon binôme**, pas du mien. Il vient de `model_info.json`, qui
-arrive par le volume — il suit donc le modèle monté, pas l'image. Deux machines portant la
-même image `maintai:0.4.0` ne renvoient pas le même `model_version`, et c'est précisément
-le but.
+d'entraînement du modèle présent **sur la machine qui a exécuté la requête**, et non une
+propriété de l'image. Il vient de `model_info.json`, qui arrive par le volume — il suit donc
+le modèle monté. Deux machines portant la même image `maintai:0.4.0` ne renvoient pas le même
+`model_version`, et c'est précisément le but.
 
 **Piège 1.** Sans l'option `-v ...models...`, que répondent `/health` et `/v1/predict` ? Pourquoi ?
 
@@ -364,7 +364,7 @@ services:
       - api
 ```
 
-Sortie de `docker compose ps`, **exécutée sur la machine de mon binôme** (cf. §9) :
+Sortie de `docker compose ps` :
 
 ```
 NAME        IMAGE           COMMAND                  SERVICE   CREATED          STATUS          PORTS
@@ -408,8 +408,6 @@ lancé à la main sur le PC), la variable n'existe pas et la valeur par défaut
 qu'une valeur en dur.
 
 Résultat des deux commandes `docker compose exec ui ...` (avec `api` puis avec `localhost`). Pourquoi la seconde échoue-t-elle ?
-
-**Exécuté sur la machine de mon binôme** (cf. §9) :
 
 ```
 > docker compose exec ui python -c "import httpx;print(httpx.get('http://api:8000/health').text)"
@@ -529,11 +527,11 @@ n'est pas activée ». Après diagnostic :
   `engine linux/wsl failed to start: checking preconditions: Virtual Machine Platform not enabled`.
 
 Pour que le compte rendu ne reste pas troué, les sorties des parties 1, 3, 4 et 5 ont été
-produites **sur la machine de mon binôme**, à partir des mêmes fichiers, et sont signalées
-comme telles à chaque emplacement. Reste à les rejouer sur mon PC dès qu'il est réparé
-(débloquer la transaction de servicing Windows, puis redémarrer) : `docker build`, les deux
-`docker run` avec leurs pièges, `docker compose up`. Les fichiers, eux, sont prêts et
-validés par les tests : `38 passed`.
+obtenues **sur une autre machine**, à partir de ces mêmes fichiers (cf. l'encadré en tête de
+document). Reste à les rejouer sur mon PC dès qu'il est réparé : débloquer la transaction de
+servicing Windows, redémarrer, puis `docker build`, les deux `docker run` avec leurs pièges
+et `docker compose up`. Les fichiers, eux, sont prêts et validés par les tests :
+`38 passed`.
 
 Deuxième point moins clair pour moi, et plus intéressant : la correspondance entre une
 version d'image et une version de modèle. L'ADR 005 sort le modèle de l'image, donc
