@@ -1,0 +1,63 @@
+# ============================================================================
+#  .dockerignore : ce qui n'est PAS envoyé au démon Docker comme contexte de build,
+#  donc ce qui ne peut pas entrer dans l'image, même via un COPY large.
+#  Deux effets : une image plus légère et sans secret, et un build qui démarre plus
+#  vite (le contexte transféré est plus petit).
+#  Une ligne par dossier ou fichier ; un dossier se termine par /
+#  ATTENTION : Docker ne reconnaît un commentaire qu'en DÉBUT de ligne. Un "#" placé
+#  après un motif serait lu comme une partie du motif, et le motif ne filtrerait plus.
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# Lignes fournies par le starter : l'outillage local
+# ---------------------------------------------------------------------------
+
+# L'environnement Python du PC : compilé pour Windows, inutilisable dans une image
+# Linux. L'image refait son propre pip install (étape 3 du Dockerfile).
+.venv/
+
+# Bytecode régénéré automatiquement par Python.
+__pycache__/
+
+# Caches d'outils, locaux à la machine.
+.pytest_cache/
+.ruff_cache/
+
+# Tout l'historique Git : lourd, et sans aucun usage à l'exécution.
+.git/
+
+# Artefacts de packaging du TP4 : le wheel construit, le dossier temporaire de build
+# et les métadonnées laissées par "pip install -e .".
+dist/
+build/
+*.egg-info/
+
+# On ne teste pas dans l'image de production : les tests tournent avant le build,
+# sur le PC et dans la CI. Les exclure retire aussi pytest du besoin de l'image.
+tests/
+
+# ---------------------------------------------------------------------------
+# Les 5 ajouts du sprint 1
+# ---------------------------------------------------------------------------
+
+# 1) Les données : lourdes, privées, et elles arrivent par un volume
+#    (service ui de compose.yaml : ./data:/app/data:ro).
+data/
+
+# 2) Le modèle : il change à chaque entraînement alors que le code ne change pas.
+#    L'inclure obligerait à reconstruire l'image pour remplacer un .joblib — c'est la
+#    décision de l'ADR 005. Il arrive par un volume : ./models:/app/models:ro
+models/
+
+# 3) Le secret : la clé API arrive au lancement (--env-file .env / env_file: .env).
+#    Un secret écrit dans une image y reste dans l'historique des couches, même si
+#    une instruction suivante le supprime : docker history le retrouverait.
+.env
+
+# 4) Le suivi des entraînements (TP5) : la base et les artefacts MLflow servent à
+#    comparer des runs, jamais à répondre à une requête de l'API.
+mlflow.db
+mlruns/
+
+# 5) Le cache DVC (TP5) : versionnement des données, volumineux et hors sujet ici.
+.dvc/

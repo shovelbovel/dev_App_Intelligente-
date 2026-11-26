@@ -1,0 +1,77 @@
+# ============================================================================
+#  MaintAI en deux conteneurs : l'API (FastAPI) et l'interface (Streamlit).
+#  Lancer  : docker compose up -d --build      Arrêter : docker compose down
+#
+#  Ce fichier remplace les deux longues commandes docker run : Compose crée un
+#  réseau privé pour les services, où chacun est joignable PAR SON NOM (api, ui)
+#  grâce au DNS interne de Docker.
+#  Syntaxe YAML : deux espaces par niveau, jamais de tabulation ; une liste
+#  commence par un tiret. Ici, contrairement au .dockerignore, un "#" en fin de
+#  ligne est bien un commentaire.
+# ============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # api : l'API MaintAI, construite depuis le Dockerfile du dossier courant
+  # ---------------------------------------------------------------------------
+  api:
+    # build: . → Compose construit l'image à partir du Dockerfile d'à côté.
+    build: .
+    # image: → le nom/tag donné à l'image construite. C'est le même que celui du
+    # TP (docker build -t maintai:0.4.0 .), et c'est ce tag que le service ui
+    # réutilise plus bas, pour ne pas construire deux fois la même chose.
+    image: maintai:0.4.0
+    # env_file → les variables du fichier .env sont injectées AU LANCEMENT :
+    # MAINTAI_API_KEY (comme au TP2). La clé n'est donc jamais dans l'image, et
+    # .env est exclu par .dockerignore et par .gitignore.
+    env_file: .env
+    ports:
+      # "PC:conteneur" → le port 8000 du conteneur devient http://localhost:8000
+      # sur le PC. C'est ce qui rend /docs et /health accessibles au navigateur.
+      # Cela suppose que l'API écoute sur 0.0.0.0 (CMD du Dockerfile).
+      - "8000:8000"
+    volumes:
+      # Le modèle n'est pas dans l'image (ADR 005) : il arrive ici.
+      # "./models" = dossier du PC, à côté de ce fichier ; "/app/models" = chemin
+      # dans le conteneur, celui fixé par ENV MAINTAI_MODELS_DIR ; ":ro" = lecture
+      # seule, le conteneur ne peut pas écraser le modèle.
+      # Sans cette ligne : /health répond model_loaded=false et /v1/predict → 503.
+      - ./models:/app/models:ro
+
+  # ---------------------------------------------------------------------------
+  # ui : l'interface Streamlit, MÊME image, autre commande
+  # ---------------------------------------------------------------------------
+  ui:
+    # Pas de "build:" ici : on réutilise l'image taguée par le service api, qui
+    # contient déjà streamlit et le dossier ui/. Un seul build pour deux services.
+    image: maintai:0.4.0
+    # La commande remplace le CMD du Dockerfile (qui lançait uvicorn).
+    # Elle commence par "python -m" : avec "streamlit" seul, le dossier courant ne
+    # serait pas dans sys.path et on retomberait sur le "No module named 'maintai'"
+    # du TP3.
+    # --server.address=0.0.0.0 : même piège que l'API, sinon Streamlit n'écouterait
+    #   que l'intérieur du conteneur et le port publié ne servirait à rien.
+    # --server.headless=true : pas de tentative d'ouvrir un navigateur, et pas de
+    #   question interactive sur l'adresse e-mail au premier démarrage.
+    command: ["python", "-m", "streamlit", "run", "ui/app.py",
+              "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]
+    environment:
+      # L'adresse de l'API VUE DEPUIS CE CONTENEUR. Ce n'est pas "localhost" :
+      # localhost désignerait le conteneur ui lui-même, où seul Streamlit tourne
+      # (port 8501). "api" est le nom du service, résolu par le DNS de Docker.
+      # ui/app.py lit cette variable avec os.getenv et s'en sert comme valeur par
+      # défaut de la barre latérale.
+      MAINTAI_API_URL: http://api:8000
+    ports:
+      # L'interface devient http://localhost:8501 sur le PC.
+      - "8501:8501"
+    volumes:
+      # L'onglet "Données" lit data/sensors.csv (chemin fixé par
+      # ENV MAINTAI_DATA_PATH), et les données sont exclues de l'image : volume.
+      - ./data:/app/data:ro
+    depends_on:
+      # Démarre api avant ui. Attention : cela attend que le conteneur soit lancé,
+      # pas que l'API réponde — l'interface peut donc s'ouvrir quelques secondes
+      # avant que /health soit prêt (uvicorn met ~20 s à charger le modèle).
+      - api
