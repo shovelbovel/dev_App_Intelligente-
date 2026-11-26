@@ -1,6 +1,6 @@
 # Compte rendu · TP6 : conteneuriser MaintAI (Docker, Docker Compose)
 
-**Groupe :G1 ·  **Membres :Rim ZAKI ·  **Date :** 26/11/2026
+**Groupe :G1 ·  **Membres :Rim ZAKI ·  **Date :** 26/11/2026 11:56
 
 ---
 
